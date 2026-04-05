@@ -4,10 +4,8 @@ import random
 
 app = FastAPI()
 
-# Possible actions
 ACTIONS = ["work", "spam", "important", "personal"]
 
-# Email dataset
 emails = [
     ("Team meeting at 10 AM", "work"),
     ("Win a free iPhone now!!!", "spam"),
@@ -16,7 +14,6 @@ emails = [
     ("Your bank account needs verification", "spam")
 ]
 
-# Store state
 last_email = None
 last_label = None
 
@@ -27,7 +24,6 @@ class ActionInput(BaseModel):
 def home():
     return {"message": "OpenEnv Email Triage Environment (Advanced)"}
 
-# RESET endpoint
 @app.post("/reset")
 def reset():
     global last_email, last_label
@@ -41,7 +37,6 @@ def reset():
         "valid_actions": ACTIONS
     }
 
-# STEP endpoint (FIXED)
 @app.post("/step")
 def step(input: ActionInput):
     global last_email, last_label

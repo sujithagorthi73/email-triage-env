@@ -1,4 +1,5 @@
 from fastapi import FastAPI
+from pydantic import BaseModel
 import random
 
 app = FastAPI()
@@ -15,15 +16,18 @@ emails = [
     ("Your bank account needs verification", "spam")
 ]
 
-# Store last state
+# Store state
 last_email = None
 last_label = None
+
+class ActionInput(BaseModel):
+    action: str
 
 @app.get("/")
 def home():
     return {"message": "OpenEnv Email Triage Environment (Advanced)"}
 
-# RESET (OpenEnv calls this first)
+# RESET endpoint
 @app.post("/reset")
 def reset():
     global last_email, last_label
@@ -37,14 +41,13 @@ def reset():
         "valid_actions": ACTIONS
     }
 
-# STEP (OpenEnv sends only action)
+# STEP endpoint (FIXED)
 @app.post("/step")
-def step(data: dict):
+def step(input: ActionInput):
     global last_email, last_label
 
-    action = data.get("action")
+    action = input.action
 
-    # Reward logic
     if action == last_label:
         reward = 1.0
         result = "correct"
@@ -62,31 +65,4 @@ def step(data: dict):
         "reward": reward,
         "result": result,
         "done": True
-    }
-
-# OPTIONAL: simple evaluation endpoint (extra strength)
-@app.get("/evaluate")
-def evaluate():
-    total = 0
-    trials = 5
-
-    for _ in range(trials):
-        email, label = random.choice(emails)
-
-        if "free" in email.lower():
-            pred = "spam"
-        elif "meeting" in email.lower() or "project" in email.lower():
-            pred = "work"
-        else:
-            pred = "personal"
-
-        if pred == label:
-            total += 1
-        elif pred in ["work", "important"] and label == "work":
-            total += 0.5
-
-    return {
-        "trials": trials,
-        "score": total,
-        "average": round(total / trials, 2)
     }

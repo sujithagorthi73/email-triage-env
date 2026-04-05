@@ -20,44 +20,24 @@ last_label = None
 class ActionInput(BaseModel):
     action: str
 
-@app.get("/")
-def home():
-    return {"message": "OpenEnv Email Triage Environment (Advanced)"}
-
 @app.post("/reset")
 def reset():
     global last_email, last_label
-
     email, label = random.choice(emails)
     last_email = email
     last_label = label
-
-    return {
-        "observation": email,
-        "valid_actions": ACTIONS
-    }
+    return {"observation": email, "valid_actions": ACTIONS}
 
 @app.post("/step")
 def step(input: ActionInput):
     global last_email, last_label
-
     action = input.action
 
     if action == last_label:
         reward = 1.0
-        result = "correct"
     elif action in ["work", "important"] and last_label == "work":
         reward = 0.5
-        result = "partially correct"
     else:
         reward = -1.0
-        result = "wrong"
 
-    return {
-        "email": last_email,
-        "prediction": action,
-        "correct": last_label,
-        "reward": reward,
-        "result": result,
-        "done": True
-    }
+    return {"reward": reward, "done": True}

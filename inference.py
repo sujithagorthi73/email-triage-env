@@ -5,7 +5,7 @@ BASE_URL = "https://sujithagorthi-email-triage-env.hf.space"
 def main():
     print("START")
 
-    res = requests.post(BASE_URL + "/reset")
+res = requests.post(BASE_URL + "/step", json={"action": action}, timeout=10)
     data = res.json()
 
     obs = data["observation"]

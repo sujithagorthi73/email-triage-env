@@ -5,36 +5,29 @@ BASE_URL = "https://sujithagorthi-email-triage-env.hf.space"
 def main():
     print("START")
 
-    try:
-        # RESET
-        res = requests.post(f"{BASE_URL}/reset")
-        data = res.json()
+    res = requests.post(BASE_URL + "/reset")
+    data = res.json()
 
-        observation = data.get("observation")
-        print("STEP: 1")
-        print(f"Observation: {observation}")
+    obs = data["observation"]
 
-        # simple agent
-        if observation and ("free" in observation.lower() or "win" in observation.lower()):
-            action = "spam"
-        elif observation and ("meeting" in observation.lower() or "project" in observation.lower()):
-            action = "work"
-        else:
-            action = "personal"
+    print("STEP: 1")
+    print("Observation:", obs)
 
-        print(f"Action: {action}")
+    if "free" in obs.lower() or "win" in obs.lower():
+        action = "spam"
+    elif "meeting" in obs.lower() or "project" in obs.lower():
+        action = "work"
+    else:
+        action = "personal"
 
-        # STEP
-        res = requests.post(f"{BASE_URL}/step", json={"action": action})
-        result = res.json()
+    print("Action:", action)
 
-        print(f"Result: {result}")
+    res = requests.post(BASE_URL + "/step", json={"action": action})
+    result = res.json()
 
-    except Exception as e:
-        print("ERROR:", str(e))
+    print("Result:", result)
 
     print("END")
-
 
 if __name__ == "__main__":
     main()
